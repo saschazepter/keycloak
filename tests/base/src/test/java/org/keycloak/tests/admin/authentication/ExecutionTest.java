@@ -221,7 +221,12 @@ public class ExecutionTest extends AbstractAuthenticationTest {
                 .representation(rep)
                 .resourceType(ResourceType.AUTH_EXECUTION);
 
-        // check execution was added
+        // check that the created execution can be retrieved by ID
+        AuthenticationExecutionRepresentation authCookieExecRetrievedById =
+                authMgmtResource.getExecution(createdId);
+        compareExecution(newExec("auth-cookie", CONDITIONAL, false, flow.getId()), authCookieExecRetrievedById);
+
+        // check that the created execution is contained in the executions of flow
         List<AuthenticationExecutionInfoRepresentation> executions = authMgmtResource.getExecutions("Copy-of-browser");
         exec = findExecutionByProvider("auth-cookie", executions);
         Assertions.assertNotNull(exec, "auth-cookie added");

@@ -27,8 +27,10 @@ import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.events.admin.OperationType;
 import org.keycloak.events.admin.ResourceType;
+import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
+import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.testframework.annotations.InjectAdminEvents;
@@ -38,7 +40,7 @@ import org.keycloak.testframework.events.AdminEvents;
 import org.keycloak.testframework.realm.ManagedRealm;
 import org.keycloak.testframework.util.ApiUtil;
 import org.keycloak.tests.utils.admin.AdminEventPaths;
-
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -108,6 +110,19 @@ public abstract class AbstractAuthenticationTest {
         return null;
     }
 
+    void compareExecution(AuthenticationExecutionRepresentation expected, AuthenticationExecutionRepresentation actual) {
+        compareCommonExecutionSettings(expected, actual);
+        Assertions.assertEquals(expected.getParentFlow(), actual.getParentFlow(), "Execution parentFlow - " + actual.getAuthenticator());
+    }
+
+    private static void compareCommonExecutionSettings(AbstractAuthenticationExecutionRepresentation expected,
+            AbstractAuthenticationExecutionRepresentation actual) {
+        Assertions.assertEquals(expected.getAuthenticator(), actual.getAuthenticator(), "Execution authenticator - " + actual.getAuthenticator());
+        Assertions.assertEquals(expected.isAuthenticatorFlow(), actual.isAuthenticatorFlow(), "Execution authenticatorFlow - " + actual.getAuthenticator());
+        Assertions.assertEquals(expected.getAuthenticatorConfig(), actual.getAuthenticatorConfig(), "Execution authenticatorConfig - " + actual.getAuthenticatorConfig());
+        Assertions.assertEquals(expected.getRequirement(), actual.getRequirement(), "Execution requirement - " + actual.getAuthenticator());
+    }
+
     void compareExecution(AuthenticationExecutionInfoRepresentation expected, AuthenticationExecutionInfoRepresentation actual) {
         Assertions.assertEquals(expected.getRequirement(), actual.getRequirement(), "Execution requirement - " + actual.getProviderId());
         Assertions.assertEquals(expected.getDisplayName(), actual.getDisplayName(), "Execution display name - " + actual.getProviderId());
@@ -121,13 +136,10 @@ public abstract class AbstractAuthenticationTest {
     }
 
     void compareExecution(AuthenticationExecutionExportRepresentation expected, AuthenticationExecutionExportRepresentation actual) {
+        compareCommonExecutionSettings(expected, actual);
         Assertions.assertEquals(expected.getFlowAlias(), actual.getFlowAlias(), "Execution flowAlias - " + actual.getFlowAlias());
-        Assertions.assertEquals(expected.getAuthenticator(), actual.getAuthenticator(), "Execution authenticator - " + actual.getAuthenticator());
         Assertions.assertEquals(expected.isUserSetupAllowed(), actual.isUserSetupAllowed(), "Execution userSetupAllowed - " + actual.getAuthenticator());
-        Assertions.assertEquals(expected.isAuthenticatorFlow(), actual.isAuthenticatorFlow(), "Execution authenticatorFlow - " + actual.getAuthenticator());
-        Assertions.assertEquals(expected.getAuthenticatorConfig(), actual.getAuthenticatorConfig(), "Execution authenticatorConfig - " + actual.getAuthenticatorConfig());
         Assertions.assertEquals(expected.getPriority(), actual.getPriority(), "Execution priority - " + actual.getAuthenticator());
-        Assertions.assertEquals(expected.getRequirement(), actual.getRequirement(), "Execution requirement - " + actual.getAuthenticator());
     }
 
     void compareExecutions(List<AuthenticationExecutionExportRepresentation> expected, List<AuthenticationExecutionExportRepresentation> actual) {
@@ -165,6 +177,17 @@ public abstract class AbstractAuthenticationTest {
         flow.setTopLevel(topLevel);
         flow.setBuiltIn(builtIn);
         return flow;
+    }
+
+    AuthenticationExecutionRepresentation newExec(String authenticator, String requirement, boolean authenticatorFlow,
+            String parentFlowId) {
+        AuthenticationExecutionRepresentation execution = new AuthenticationExecutionRepresentation();
+        execution.setAuthenticator(authenticator);
+        execution.setRequirement(requirement);
+        execution.setAuthenticatorFlow(authenticatorFlow);
+        execution.setParentFlow(parentFlowId);
+
+        return execution;
     }
 
     AuthenticationExecutionInfoRepresentation newExecInfo(String displayName, String providerId, Boolean configurable,
