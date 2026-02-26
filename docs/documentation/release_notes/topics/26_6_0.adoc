@@ -69,6 +69,11 @@ For more details on the Operator configuration, see the https://www.keycloak.org
 
 The feature `step-up-authentication-saml` extends the step-up authentication to include the SAML protocol and clients. This feature is in preview mode. Additional information is available in the link:{adminguide_link}#_step-up-authentication-saml[{adminguide_name}].
 
+== Traefik Client certificate lookup
+
+You can now use a new client certificate lookup provider specifically for Traefik proxies.
+For details, navigate to link:{server_guide_base_link}/reverseproxy#_enabling_client_certificate_lookup[Enabling Client Certificate Lookup] section of the documentation.
+
 = Java 25 support
 
 {project_name} now supports running with JRE 25. OpenJDK 25 is also now used in the official container images.
