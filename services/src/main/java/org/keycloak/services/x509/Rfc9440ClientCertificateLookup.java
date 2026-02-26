@@ -138,7 +138,7 @@ public class Rfc9440ClientCertificateLookup implements X509ClientCertificateLook
 
         // the chain might be bigger than the configured limit - truncate to the configured limit
         if (encodedCerts.size() > certificateChainLength) {
-            log.warnf("The amount of certificates in the chain header %d is bigger than the configured limit of %d. Truncating.", encodedCerts.size(), certificateChainLength);
+            log.debugf("The amount of certificates in the chain header %d is bigger than the configured limit of %d. Truncating.", encodedCerts.size(), certificateChainLength);
             encodedCerts = encodedCerts.subList(0, certificateChainLength);
         }
 
